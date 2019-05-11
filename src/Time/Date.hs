@@ -14,7 +14,7 @@ module Time.Date
     , addMonths 
     , addYears   
     -- * Some useful functions     
-    , daysofMonth
+    , daysOfMonth
     , dayOfWeek
     , isWeekEnd 
     , isEndOfMonth
@@ -46,15 +46,18 @@ getMonth = month
 getYear = year
    
 -- | Checks is a given date is valid
+-- A Day is valid only if : Year is between 1900 and 2199 
+-- Month is between  1 and 12 
+-- Day is between 1 and the number of days of the corresponding month 
 isValidDate :: Date -> Bool
 isValidDate (Date y m d) 
-       | (y < 1900)  || (m>12) || (m<=0) || (d <= 0) = False 
-       |  d > (daysofMonth y m)                      = False
-       | otherwise                                   = True
+       | (y < 1900) || (y>  2199) || (m>12) || (m<=0) || (d <= 0) = False 
+       |  d > (daysOfMonth y m)                                   = False
+       | otherwise                                                = True
   
 -- | Number of days in a given month 
-daysofMonth :: Int -> Int -> Int 
-daysofMonth year month 
+daysOfMonth :: Int -> Int -> Int 
+daysOfMonth year month 
     | month == 2 = 28 + if (isLeapYear year) then 1 else 0
     | otherwise  = 31 -  rem (rem (month-1) 7) 2
 
@@ -110,23 +113,31 @@ instance Enum Date where
  
    pred (Date y 1 1)  =mkDate (y-1) 12 31
    pred (Date y m d) 
-      | isFirstOfMonth (Date y m d) = mkDate y (m-1) (daysofMonth y m)
+      | isFirstOfMonth (Date y m d) = mkDate y (m-1) (daysOfMonth y m)
       | otherwise                   = mkDate y m (d-1) 
     
    toEnum     n  
-      | n<=1     = Date 1900 1 1  -- it's a default date
-      | otherwise =  foldl ( \acc  x -> succ acc) (Date 1900 1 1) [2..n]
+      | n<=1     = Date 1900 1 1  -- it's a default date 
+      | otherwise = 
+            let 
+              years =  takeWhile (<n) $ scanl (\acc y -> acc + if isLeapYear y then 366 else 365) 0 [1900..]
+              year = (length years) + 1899 
+              months =  takeWhile (< n -(last years) ) $ scanl (\acc m -> acc + (daysOfMonth year m)) 0 [1..12] 
+              month  =  length months  
+              day =  n-(last years)-(last months) 
+             in (mkDate year month day)  
    
 
    fromEnum (Date 1900 1 1) = 1 
    fromEnum (Date y 1 1)  = 1 + (sum $  map ( \x -> if (isLeapYear x) then 366 else 365) [1900 .. (y-1)] )
-   fromEnum (Date y m 1)  =  (sum $  map ( \m -> daysofMonth y m) [1..(m-1)] ) + fromEnum (Date y 1 1)
+   fromEnum (Date y m 1)  =  (sum $  map ( \m -> daysOfMonth y m) [1..(m-1)] ) + fromEnum (Date y 1 1)
    fromEnum (Date y m d)  = d - 1 + fromEnum (Date y m 1)               
-      
+ 
+
 -- | Indicates if a day is the end of month 
 isEndOfMonth :: Date -> Bool
 isEndOfMonth (Date y m d) 
-      | (daysofMonth y m)==d = True
+      | (daysOfMonth y m)==d = True
       | otherwise            = False  
 
 -- | Indicates if a date corresponds to the first date of the month 

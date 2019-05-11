@@ -1,3 +1,4 @@
 module Main where 
-
-main= putStrLn " HELLO WORLD"
+import Time.Date 
+main= do 
+        print $ daysOfMonth 12 5 
