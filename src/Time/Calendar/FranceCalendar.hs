@@ -1,26 +1,33 @@
+{-|
+Module      : Time.Calendar.FranceCalendar
+Description : This module defines the FranceCalendar DataType. It can be used as an example for other calendars 
+Copyright   : (c) Zakaria kadi
+Maintainer  : zakaria.kadi123@outlook.com
+Stability   : experimental
+-}
+module Time.Calendar.FranceCalendar
+  ( 
+   -- * French calendar constructor: It doesn't take any argument
+   FranceCalendar(..)
+  ) where 
+  
+import Time.Date
+import Time.Calendar.BaseCalendar
+import Control.Exception.Assert  
 
-module Time.Calendar
-  (
-    -- * Calendar DataType 
-    Calendar(..)
-    -- * Calendards by Countries 
-    ,franceCalendar
-) where
 
-import Time.Date 
+-- | Simple definition of the FrancceCalendar dataType
+data FranceCalendar = FranceCalendar 
 
--- |  Calendar DataType
-data  Calendar = Calendar { 
-                            country :: String                        -- ^ Calendar's country 
-                          , isHoliday :: Date -> Bool                -- ^ This function returns True if a given date coincides with a holiday and False otherwise 
-                          }  
 
--- | Definition of the French Calendar 
-franceCalendar = ( Calendar { country ="France" , isHoliday = isFranceHoliday })
+-- | FranceCalendar is an instance of the Cal typeClass 
 
--- | Indicates whether a date is a French holiday
-isFranceHoliday  :: Date -> Bool 
-isFranceHoliday  d = isFranceFixedDateHoliday d || isFranceFloatingDateHoliday d
+instance Cal FranceCalendar where 
+    -- | This function indicates if the given date coincides with a holiday in a the french Calendar 
+    isHoliday  _ d = isFranceFixedDateHoliday d || isFranceFloatingDateHoliday d
+    
+
+
 
 -- | Indicates whether a date belongs to fixed date holiday 
 isFranceFixedDateHoliday :: Date -> Bool
