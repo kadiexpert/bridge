@@ -20,6 +20,7 @@ module Time.Date
     , isEndOfMonth
     , isFirstOfMonth
     , isLeapYear
+    , daysBetween
   ) where
 
 import Control.Exception.Assert 
@@ -189,4 +190,8 @@ substructMonth (Date y m d)
 -- | This function adds a given number of years (n) to a given date : n can be negatif 
 addYears :: Date -> Int -> Date 
 addYears (Date y m d) n = mkDate (y+n) m n
+
+-- | Calculates the number of days between two date 
+daysBetween :: Date -> Date -> Int 
+daysBetween d1 d2  = let diff =(fromEnum d2) - (fromEnum d1) in assert (diff >=0) diff
 

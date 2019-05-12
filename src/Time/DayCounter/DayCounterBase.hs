@@ -23,5 +23,5 @@ class DayCounter dc where
     dayCount     :: dc -> Date -> Date -> Int 
    
     -- | Returns the period between two dates as a fraction of year  
-    yearFraction :: dc -> Date -> Date -> Fractional    
+    yearFraction :: dc -> Date -> Date -> Double   
 
